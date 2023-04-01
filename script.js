@@ -22,8 +22,10 @@ function addTaskHandler() {
         let newTask = new Task(taskNameInput.value);
         newTask.createIn(taskList);
         tasks.push(newTask);
+        saveTasks()
 
         taskNameInput.value = "";
+
     } else {
         alert("Enter New Task");
     }
@@ -44,7 +46,9 @@ function showNotCompletedHandler() {
             task.createIn(taskList);
         });
 }
-
+function saveTasks() {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+}
 class Task {
     constructor(text) {
         this.text = text;
@@ -92,6 +96,7 @@ class Task {
     deleteTask (element){
         this.div.remove()
         this.isDeleted = true;
+        saveTasks();
     }
     editTask(element) {
         element.innerText = '';
@@ -110,3 +115,11 @@ class Task {
         this.div.classList.toggle("completed");
     }
 }
+// This code adds an event listener for the load event that reads the tasks array from local storage and converts the JSON string to an array of Task objects. If there are stored tasks, it assigns the parsed array to the tasks variable, and then calls the showAllHandler() function to display the tasks.
+window.addEventListener("load", () => {
+    const storedTasks = JSON.parse(localStorage.getItem("tasks"));
+    if (storedTasks) {
+        tasks = storedTasks.map(task => new Task(task.text, task.isDone));
+        showAllHandler();
+    }
+});
